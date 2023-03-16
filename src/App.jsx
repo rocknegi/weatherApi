@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import Geocode from "react-geocode";
 import { useFetch } from './hooks/useFetch';
@@ -14,6 +14,7 @@ export default function App() {
   const [lng, setlng] = useState(null);
   const [favList, setFavList] = useState([]);
   const [{ data, error, loading }, fetchData] = useFetch(null);
+  const id = useId()
 
   useEffect(() => {
     if (value) {
@@ -62,7 +63,7 @@ export default function App() {
             }
             console.log(city, country);
             const location = `${city}, ${country}`
-            setValue({...value, label: location })
+            setValue({...value, label: location, value:{place_id:id} })
           },
           (error) => {
             console.error(error);
@@ -107,7 +108,7 @@ export default function App() {
       <div className='flex flex-col items-center'>
         Favourite places
         {favList && favList.map(item => (
-          <div onClick={()=>setValue({label:item})} className='text-sm border-b-2 w-2/6 text-center cursor-pointer'>
+          <div key={item} onClick={()=>setValue({label:item})} className='text-sm border-b-2 w-2/6 text-center cursor-pointer'>
             {item}
           </div>
         ))}
