@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react'
 export function useFetch(url) {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const fetchData = async (url) => {
+        setLoading(true);
         try {
             console.log(url)
             const response = await fetch(url);
