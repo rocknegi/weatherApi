@@ -19,11 +19,11 @@ export default function WeatherCard({ data, loading }) {
                 <div
                     className='p-2 border border-gray-200 rounded-t-3xl rounded-b-3xl sm:w-1/3 h-36 bg-sky-300'>
                     <div
-                        className='font-bold text-3xl p-2'
+                        className='font-bold text-3xl py-2'
                     >{current_weather.temperature}{hourly_units.temperature_2m
                         }</div>
-                    <div>Wind speed is {current_weather.windspeed} {windspeed_10m_max}</div>
-                    <div>Wind direction is {current_weather.winddirection}</div>
+                    <div className='text-center'>Wind speed is {current_weather.windspeed} {windspeed_10m_max}</div>
+                    <div className='text-center'>Wind direction is {current_weather.winddirection}</div>
                 </div>
             </div>
             <div className='flex justify-center text-2xl m-5'>5 day forecast</div>

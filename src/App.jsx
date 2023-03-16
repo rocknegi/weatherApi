@@ -14,11 +14,11 @@ export default function App() {
   const [lng, setlng] = useState(null);
   const [favList, setFavList] = useState([]);
   const [{ data, error, loading }, fetchData] = useFetch(null);
+  const [loader,toggleLoader] = useState(false)
   const id = useId()
 
   useEffect(() => {
     if (value) {
-      console.log(value)
       Geocode.fromAddress(value.label).then(
         (response) => {
           const { lat, lng } = response.results[0].geometry.location;
@@ -31,6 +31,7 @@ export default function App() {
       );
     }
   }, [value]);
+
   useEffect(() => {
     if (lat && lng) {
       fetchData(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m&daily=temperature_2m_max,temperature_2m_min,uv_index_max,windspeed_10m_max&current_weather=true&forecast_days=5&timezone=Europe%2FBerlin`)
@@ -38,10 +39,9 @@ export default function App() {
   }, [lat, lng]);
 
   const getCurrentLocation = async () => {
+    toggleLoader(true);
     await navigator.geolocation.getCurrentPosition(
       position => {
-        // setlat(position.coords.latitude)
-        // setlng(position.coords.longitude)
         Geocode.fromLatLng(position.coords.latitude, position.coords.longitude).then(
           (response) => {
             const address = response.results[0].formatted_address;
@@ -61,9 +61,9 @@ export default function App() {
                 }
               }
             }
-            console.log(city, country);
             const location = `${city}, ${country}`
-            setValue({...value, label: location, value:{place_id:id} })
+            setValue({ ...value, label: location, value: { place_id: id } });
+            toggleLoader(false);
           },
           (error) => {
             console.error(error);
@@ -105,17 +105,17 @@ export default function App() {
       </div>
 
 
-      <div className='flex flex-col items-center'>
+      {favList.length>0 && <div className='flex flex-col items-center'>
         Favourite places
-        {favList && favList.map(item => (
-          <div key={item} onClick={()=>setValue({label:item})} className='text-sm border-b-2 w-2/6 text-center cursor-pointer'>
+        {favList.map(item => (
+          <div key={item} onClick={() => setValue({ label: item })} className='text-sm border-b-2 w-2/6 text-center cursor-pointer'>
             {item}
           </div>
         ))}
-      </div>
+      </div>}
 
       {error && <div>Something went wrong</div>}
-      {loading && <Loader />}
+      {(loading||loader) && <Loader />}
       {data && <WeatherCard data={data} loading={loading} />}
     </div>
   )
