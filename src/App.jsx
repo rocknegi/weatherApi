@@ -12,10 +12,12 @@ export default function App() {
   const [value, setValue] = useState(null);
   const [lat, setlat] = useState(null);
   const [lng, setlng] = useState(null);
+  const [favList, setFavList] = useState([]);
   const [{ data, error, loading }, fetchData] = useFetch(null);
 
   useEffect(() => {
     if (value) {
+      console.log(value)
       Geocode.fromAddress(value.label).then(
         (response) => {
           const { lat, lng } = response.results[0].geometry.location;
@@ -42,7 +44,13 @@ export default function App() {
       },
       err => alert(err.message)
     );
-  }
+  };
+
+  const addToFavList = () => {
+    if (value) {
+      setFavList([...favList, value.label])
+    }
+  };
 
   return (
     <div className="p-5 flex flex-1 h-max flex-col">
@@ -58,10 +66,24 @@ export default function App() {
             onChange: setValue,
           }}
         />
+        <div className='flex flex-1 justify-between'>
+        {value && <div>
+        <button onClick={addToFavList} className='text-sm p-2'>Add {value.label} to fav list?</button>
+      </div>}
+          <button onClick={getCurrentLocation} className='text-sm'>Use current location</button>
+        </div>
       </div>
-      <div className='flex flex-1 justify-center mt-2'>
-        <button onClick={getCurrentLocation} className='bg-gray-100 rounded-lg w-38 p-2'>Use current location</button>
+
+
+      <div className='flex flex-col items-center'>
+        Favourite places
+        {favList && favList.map(item => (
+          <div onClick={()=>setValue({label:item})} className='text-sm border-b-2 w-2/6 text-center cursor-pointer'>
+            {item}
+          </div>
+        ))}
       </div>
+
       {error && <div>Something went wrong</div>}
       {loading && <Loader />}
       {data && <WeatherCard data={data} loading={loading} />}
