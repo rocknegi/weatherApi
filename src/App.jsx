@@ -39,11 +39,40 @@ export default function App() {
   const getCurrentLocation = async () => {
     await navigator.geolocation.getCurrentPosition(
       position => {
-        setlat(position.coords.latitude)
-        setlng(position.coords.longitude)
+        // setlat(position.coords.latitude)
+        // setlng(position.coords.longitude)
+        Geocode.fromLatLng(position.coords.latitude, position.coords.longitude).then(
+          (response) => {
+            const address = response.results[0].formatted_address;
+            let city, state, country;
+            for (let i = 0; i < response.results[0].address_components.length; i++) {
+              for (let j = 0; j < response.results[0].address_components[i].types.length; j++) {
+                switch (response.results[0].address_components[i].types[j]) {
+                  case "locality":
+                    city = response.results[0].address_components[i].long_name;
+                    break;
+                  case "administrative_area_level_1":
+                    state = response.results[0].address_components[i].long_name;
+                    break;
+                  case "country":
+                    country = response.results[0].address_components[i].long_name;
+                    break;
+                }
+              }
+            }
+            console.log(city, country);
+            const location = `${city}, ${country}`
+            setValue({...value, label: location })
+          },
+          (error) => {
+            console.error(error);
+          }
+        );
       },
       err => alert(err.message)
     );
+
+
   };
 
   const addToFavList = () => {
@@ -67,10 +96,10 @@ export default function App() {
           }}
         />
         <div className='flex flex-1 justify-between'>
-        {value && <div>
-        <button onClick={addToFavList} className='text-sm p-2'>Add {value.label} to fav list?</button>
+        {(value && !favList.find(e=>e===value.label)) && <div>
+        <button onClick={addToFavList} className='text-sm p-2'>Add to fav list?</button>
       </div>}
-          <button onClick={getCurrentLocation} className='text-sm'>Use current location</button>
+          <button onClick={getCurrentLocation} className='text-sm p-2'>Use current location</button>
         </div>
       </div>
 
